@@ -203,3 +203,20 @@ from
 				co_current_param ccp
 					on cd2.id = ccp.co_def_id
 where cme.co_measurement_id = (select max(id) from co_measurement);
+
+
+create or replace view co_plot_data as
+select
+	cm.id,
+	cm.`timestamp`,
+	(select cme.value from co_measurement_elem cme where cme.co_def_id = (select id from co_def where name ='ds2') and cme.co_measurement_id = cm.id) as 'heater_temp',
+	(select cme.value from co_measurement_elem cme where cme.co_def_id = (select id from co_def where name ='ds4') and cme.co_measurement_id = cm.id) as 'outside_temp',
+    (select cpe.value from co_param_elem cpe where cpe.co_def_id = (select id from co_def where name ='set_temp') and cpe.co_param_id = cm.co_param_id) as 'set_temp',
+    (select cpe.value from co_param_elem cpe where cpe.co_def_id = (select id from co_def where name ='feeder_break') and cpe.co_param_id = cm.co_param_id) as 'feader_break'
+from
+	co_measurement cm
+WHERE 
+	cm.`timestamp` > (NOW() - INTERVAL 6 HOUR)
+order by 
+	cm.id
+;

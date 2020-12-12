@@ -1,0 +1,69 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+
+    const fetchData = (callback) => {
+      var xmlhttp = new XMLHttpRequest();
+      var url = "http://dkala.hopto.org/co_monitor/api/get_plot_data.php?api_key=web-app";
+
+      xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var myArr = JSON.parse(this.responseText);
+          callback(myArr);
+        }
+      };
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+    }
+
+    const parseDataToArray = (data) => {
+
+      var out = data.data.map(row => {
+        return [new Date(row.timestamp), row.heater_temp, row.outside_temp, row.set_temp, row.feader_break];
+      });
+
+      out.unshift(['Czas', 'Temp. pieca [\xB0C]', 'Temp. na polu [\xB0C]', 'Zadana temp. [\xB0C]', 'Czas przerwy [s]']);
+
+      return out;
+    }
+
+    function drawChart(dataArray) {
+      var data = google.visualization.arrayToDataTable(dataArray);
+
+      var options = {
+        title: 'C.O. Monitor',
+        hAxis: {
+          format: 'HH:mm',
+          gridlines: { count: 15 }
+        },
+        legend: { position: 'bottom' }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+      chart.draw(data, options);
+    }
+
+    const initChart = () => {
+      fetchData((data) => {
+        if (data.success === true) {
+          drawChart(parseDataToArray(data));
+        }
+
+        console.log(data);
+      });
+    }
+
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(initChart);
+
+  </script>
+</head>
+
+<body>
+  <div id="curve_chart" style="width: 100%; height: 100%"></div>
+</body>
+
+</html>
