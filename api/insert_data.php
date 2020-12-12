@@ -7,6 +7,9 @@
     
     $filename = 'insert_data.php';
     $raw_json = file_get_contents('php://input');
+    $raw_json_without_nan = str_replace('NAN', '0', $raw_json);
+    if($raw_json_without_nan != null)
+        $raw_json = $raw_json_without_nan;    
     $json_obj = json_decode($raw_json, true);
     $api_key = $_GET["api_key"];
 
