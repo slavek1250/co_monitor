@@ -1,6 +1,7 @@
 <html>
 
 <head>
+
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
 
@@ -16,6 +17,21 @@
       };
       xmlhttp.open("GET", url, true);
       xmlhttp.send();
+    }
+
+    function showChart(visible) {
+      let loader = document.getElementById("loader_continer");
+      let chart = document.getElementById("curve_chart");
+      if (visible) {
+        loader.classList.add("hide");
+        chart.classList.remove("hide");
+        chart.classList.add("spreadOnPage");
+      }
+      else {
+        chart.classList.remove("spreadOnPage");
+        chart.classList.add("hide");
+        loader.classList.remove("hide");
+      }
     }
 
     const parseDataToArray = (data) => {
@@ -45,11 +61,13 @@
         },
         width: '100%',
         height: '100%',
-        legend: { position: 'bottom' }
+        legend: { position: 'bottom' },
+        crosshair: { trigger: 'both' }
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 
+      showChart(true);
       chart.draw(data, options);
     }
 
@@ -68,11 +86,33 @@
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(initChart);
 
+    document.addEventListener('load', () => {
+      showChart(false);
+    });
+
+
   </script>
+
+  <style>
+    div.hide {
+      display: none;
+      visibility: hidden;
+    }
+
+    div.spreadOnPage {
+      width: 100%;
+      height: 100%
+    }
+  </style>
 </head>
 
 <body>
-  <div id="curve_chart" style="width: 100%; height: 100%"></div>
+  <div id="loader_continer">
+    <center>
+      <img src="media/loader.gif" />
+    </center>
+  </div>
+  <div id="curve_chart"></div>
 </body>
 
 </html>
