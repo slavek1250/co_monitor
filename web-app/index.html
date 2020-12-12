@@ -34,10 +34,17 @@
 
       var options = {
         title: 'C.O. Monitor',
+        chartArea: {
+          // leave room for y-axis labels
+          width: '94%',
+          height: '90%',
+        },
         hAxis: {
           format: 'HH:mm',
           gridlines: { count: 15 }
         },
+        width: '100%',
+        height: '100%',
         legend: { position: 'bottom' }
       };
 
@@ -52,9 +59,11 @@
           drawChart(parseDataToArray(data));
         }
 
-        console.log(data);
+        // console.log(data);
       });
     }
+
+    setInterval(initChart, 60000);
 
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(initChart);
