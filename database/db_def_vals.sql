@@ -25,8 +25,6 @@ insert into co_def (def_type, name, description, unit, dev_serial) values ('s', 
 set @id = (select id from co_def where name ='ds1');
 update co_def set id_co_def_pair = @id where name = 'fmt';
 set @id = (select id from co_def where name ='ds2');
-update co_def set id_co_def_pair = @id where name = 'hmt';
-set @id = (select id from co_def where name ='ds2');
 update co_def set id_co_def_pair = @id where name = 'set_temp';
 set @id = (select id from co_def where name ='distance');
 update co_def set id_co_def_pair = @id where name = 'fmd';
