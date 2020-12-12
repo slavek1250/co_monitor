@@ -35,7 +35,7 @@
         }
 
         $query1['into'] = "co_param";
-        $query1['values_list'][0]['id'] = "null";
+        $query1['values_list'][0]['id'] = $newestId + 1;
 
         $resp = $db->insert($query1);
         if($resp->status != "OK") {

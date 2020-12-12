@@ -19,10 +19,13 @@ insert into co_def (def_type, name, description, unit, dev_serial) values ('p', 
 
 -- Definitions of safety 
 insert into co_def (def_type, name, description, unit, dev_serial) values ('s', 'fmt', 'Maksymalna temperatura podajnika (Feeder Max Temp.)', '°C', null);
+insert into co_def (def_type, name, description, unit, dev_serial) values ('s', 'hmt', 'Minimalna temperatura pieca (Heater Min Temp.', '°C', null);
 insert into co_def (def_type, name, description, unit, dev_serial) values ('s', 'fmd', 'Maksymalna odległość paliwa od góry podajnika (Feeder Max Dist.)', 'cm', null);
 
 set @id = (select id from co_def where name ='ds1');
 update co_def set id_co_def_pair = @id where name = 'fmt';
+set @id = (select id from co_def where name ='ds2');
+update co_def set id_co_def_pair = @id where name = 'hmt';
 set @id = (select id from co_def where name ='ds2');
 update co_def set id_co_def_pair = @id where name = 'set_temp';
 set @id = (select id from co_def where name ='distance');
@@ -52,6 +55,15 @@ insert into co_event (name, description, operator, co_def_id_to_comp, co_def_id_
 	(select id from co_event_operation where name = 'none')
 );
 
+insert into co_event (name, description, operator, co_def_id_to_comp, co_def_id_comp_to, co_event_operation_id) values (
+	'heater_temp_too_low',
+	'Zbyt niska temperatura pieca!',
+	'<',
+	(select id from co_def where name = 'ds2'),
+	(select id from co_def where name = 'hmt'),
+	(select id from co_event_operation where name = 'none')
+);
+
 INSERT INTO `co_param` set `id` = NULL;
 
 
@@ -64,5 +76,6 @@ insert into co_param_elem (value, co_param_id, co_def_id) values ( 53, (select m
 insert into co_param_elem (value, co_param_id, co_def_id) values ( 1, (select max(id) from co_param), (select id from co_def where name = 'hist'));
 
 insert into co_param_elem (value, co_param_id, co_def_id) values ( 80, (select max(id) from co_param), (select id from co_def where name = 'fmt'));
+insert into co_param_elem (value, co_param_id, co_def_id) values ( 60, (select max(id) from co_param), (select id from co_def where name = 'hmt'));
 insert into co_param_elem (value, co_param_id, co_def_id) values ( 110, (select max(id) from co_param), (select id from co_def where name = 'fmd'));
 

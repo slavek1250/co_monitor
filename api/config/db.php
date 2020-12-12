@@ -1,5 +1,5 @@
 <?php
-    include_once '../debug/logger.php';
+    include_once 'debug/logger.php';
     $filename = 'config/db.php';
 
     /**
