@@ -3,7 +3,6 @@
 /**
  * Input data:
  * {
- *  "getMaxRange": bool,
  *  "lastHours": "6:15",
  *  "range": {
  *      "since": "2020-12-12T06:30",
@@ -70,17 +69,18 @@ if(isset($api_key) && $api_key == "web-app" && isset($raw_json) && isset($json_o
     }
 
     unset($resp);
+    unset($query);
 
-    if($ans['code'] == 200 && isset($json_obj['getMaxRange']) && $json_obj['getMaxRange'])
+    if($ans['code'] == 200)
     {
-        $query['select'] = "timestamp";
-        $query['where'] = "id in (SELECT min(id) FROM `dev_co_plot_data` union SELECT max(id) FROM `dev_co_plot_data`)";
+        $query['select'] = "*";
+        $query['from'] = "dev_co_plot_max_range";
 
         $resp = $db->select($query);
 
         if($resp->status == "OK") {
-            $ans['maxRange']['since'] = str_replace(" ", "T", $resp->output[0]['timestamp']);
-            $ans['maxRange']['until'] = str_replace(" ", "T", $resp->output[1]['timestamp']);
+            $ans['maxRange']['since'] = str_replace(" ", "T", $resp->output[0]['since']);
+            $ans['maxRange']['until'] = str_replace(" ", "T", $resp->output[0]['until']);
         }
         else {
             $ans['code'] = $resp->no;

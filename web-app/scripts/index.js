@@ -7,7 +7,6 @@
  */
 
 var timer = null;
-var maxRangeFetched = false;
 
 const fetchData = (reqBody, callback) => {
   var xmlhttp = new XMLHttpRequest();
@@ -99,7 +98,6 @@ const initChart = () => {
   const rangeUntil = document.getElementById("showRangeUntil").value;
 
   var reqBody = {
-    getMaxRange: !maxRangeFetched,
     series: [
       "timestamp", "heater_temp", "set_temp", "feeder_temp", 
       "outside_temp", "feeder_break", "feeder_revo_num"
@@ -126,7 +124,6 @@ const initChart = () => {
       drawChart(parseDataToArray(respBody));
       if(respBody.maxRange) {
         setMaxRange(respBody.maxRange);
-        maxRangeFetched = true;
       }
     }
   });

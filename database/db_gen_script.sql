@@ -220,3 +220,9 @@ from
 order by 
 	cm.id
 ;
+
+create or replace view dev_co_plot_max_range as
+select 
+	(SELECT `timestamp` FROM `dev_co_plot_data` order by id limit 1) as 'since', 
+	(SELECT `timestamp` FROM `dev_co_plot_data` order by id desc limit 1) as 'until'
+;
