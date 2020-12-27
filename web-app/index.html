@@ -1,98 +1,8 @@
 <html>
-
 <head>
   <meta charset="utf-8">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-
-    const fetchData = (callback) => {
-      var xmlhttp = new XMLHttpRequest();
-      var url = "http://dkala.hopto.org/co_monitor/api/get_plot_data.php?api_key=web-app";
-
-      xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          var myArr = JSON.parse(this.responseText);
-          callback(myArr);
-        }
-      };
-      xmlhttp.open("GET", url, true);
-      xmlhttp.send();
-    }
-
-    function showChart(visible) {
-      let loader = document.getElementById("loader_continer");
-      let chart = document.getElementById("curve_chart");
-      if (visible) {
-        loader.classList.add("hide");
-        chart.classList.remove("hide");
-        chart.classList.add("spreadOnPage");
-      }
-      else {
-        chart.classList.remove("spreadOnPage");
-        chart.classList.add("hide");
-        loader.classList.remove("hide");
-      }
-    }
-
-    const parseDataToArray = (data) => {
-
-      var out = data.data.map(row => {
-        return [new Date(row.timestamp), row.heater_temp, row.outside_temp, row.set_temp, row.feader_break];
-      });
-
-      out.unshift(['Czas', 'Temp. pieca [\xB0C]', 'Temp. na polu [\xB0C]', 'Zadana temp. [\xB0C]', 'Czas przerwy [s]']);
-
-      return out;
-    }
-
-    function drawChart(dataArray) {
-      var data = google.visualization.arrayToDataTable(dataArray);
-
-      var options = {
-        title: 'C.O. Monitor',
-        chartArea: {
-          // leave room for y-axis labels
-          width: '94%',
-          height: '90%',
-        },
-        hAxis: {
-          format: 'HH:mm',
-          gridlines: { count: 15 }
-        },
-        width: '100%',
-        height: '100%',
-        legend: { position: 'bottom' },
-        crosshair: { trigger: 'both' }
-      };
-
-      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-      showChart(true);
-      chart.draw(data, options);
-    }
-
-    const initChart = () => {
-      fetchData((data) => {
-        if (data.success === true) {
-          drawChart(parseDataToArray(data));
-        }
-
-        // console.log(data);
-      });
-    }
-
-    setInterval(initChart, 60000);
-
-    google.charts.load('current', { 'packages': ['corechart'] });
-    google.charts.setOnLoadCallback(initChart);
-
-    document.addEventListener('load', () => {
-      showChart(false);
-    });
-
-
-  </script>
-
+  <script type="text/javascript" src="scripts/index.js"></script>
   <style>
     div.hide {
       display: none;
@@ -115,43 +25,42 @@
     }
   </style>
 </head>
-
 <body>
-<div id="props" class="props">
-  <div id="propsLastHours" class="propsOption">
-    <input type="radio" id="lastHours" name="timeRange" value="lastHours" 
-        checked>
-    <label for="lastHours">Pokaż dane z ostatnich godzin</label>
-
-    <input type="time" id="lastHoursInput" name="lastHoursInput"
-        min="00:01" max="24:00" value="06:00" required>
-  </div>
-  <div id="propsShowRange" class="propsOption">
-    <input type="radio" id="showRange" name="timeRange" value="showRange">
-    <label for="showRange">Wyświetl zakres od</label>
-
-    <input type="datetime-local" id="showRangeSince"
-        name="meeting-time" value="2018-06-12T19:30"
-        min="2018-06-07T00:00" max="2018-06-14T00:00" disabled>
-
-    <label for="meeting-time">do</label>
-    <input type="datetime-local" id="showRangeUntil"
-        name="meeting-time" value="2018-06-12T19:30"
-        min="2018-06-07T00:00" max="2018-06-14T00:00" disabled>  
-  </div>
-</div>
-
-
-
-
-
-
   <div id="loader_continer">
     <center>
       <img src="media/loader.gif" />
     </center>
   </div>
-  <div id="curve_chart"></div>
-</body>
+  <div id="app_continer" class="hide">
+    <div id="props" class="props">
+      <div id="propsLastHours" class="propsOption">
+        <input type="radio" id="lastHours" name="timeRange" value="lastHours" 
+            checked>
+        <label for="lastHours">Pokaż dane z ostatnich</label>
 
+        <input type="time" id="lastHoursInput" name="lastHoursInput" step="01:00"
+            min="01:00" max="24:00" value="06:00" required>
+            
+        <label for="lastHoursInput">godzin</label>
+      </div>
+      <div id="propsShowRange" class="propsOption">
+        <input type="radio" id="showRange" name="timeRange" value="showRange">
+        <label for="showRange">Wyświetl zakres od</label>
+
+        <input type="datetime-local" id="showRangeSince"
+            name="showRangeSince" value="2018-06-12T19:30"
+            min="2018-06-07T00:00" max="2018-06-14T00:00" disabled>
+
+        <label for="showRangeUntil">do</label>
+        <input type="datetime-local" id="showRangeUntil"
+            name="showRangeUntil" value="2018-06-12T19:30"
+            min="2018-06-07T00:00" max="2018-06-14T00:00" disabled>  
+      </div>
+      <div class="propsOption">
+        <button type="button" id="propsLoadBtn">Wczytaj dane</button>
+      </div>
+    </div>
+    <div id="curve_chart"></div>
+  </div>
+</body>
 </html>
