@@ -119,6 +119,8 @@ const initChart = () => {
     }
   }
 
+  saveSettingsIntoUrl(reqBody);
+
   fetchData(reqBody, respBody => {
     if (respBody.code == 200) {
       drawChart(parseDataToArray(respBody));
@@ -151,13 +153,78 @@ const loadDataBtnHandler = () => {
   initChart();
 }
 
-google.charts.load('current', { 'packages': ['corechart'] });
-google.charts.setOnLoadCallback(initChart);
+const saveSettingsIntoUrl = settings => {
+  const displayType = (settings.lastHours ? 1 : 2);
+  let newUrlParam = `?t=${displayType}&`;
+  if(displayType == 1)
+  {
+    newUrlParam += `l=${settings.lastHours}`;
+  }
+  else if(displayType == 2)
+  {
+    const begin = settings.range.since;
+    const end = settings.range.until;
+    newUrlParam += `b=${begin}&e=${end}`;
+  }
+
+  history.replaceState(null, null, newUrlParam)
+}
+
+const restoreSettingsFromUrl = () => {
+  if(!window.location.search || window.location.search == "")
+    return false
+  
+  const params = window.location.search
+  const settType = params.match(/t=(\d+)/)
+
+  if(!settType || settType.length != 2)
+    return false
+  
+  if(settType[1] == "1")
+  {
+    settVal = params.match(/l=(\d{1,2}:\d{1,2})/)
+
+    if(!settVal || settVal.length != 2)
+      return false
+
+    document.getElementById("lastHoursInput").value = settVal[1]
+    document.getElementById("lastHours").checked = true
+
+    switchProps({ lastHours: true })
+    return true
+  }
+  else if(settType[1] == "2")
+  {
+    settVals = params.match(/b=(\d{4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{1,2})&e=(\d{4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{1,2})/)
+
+    if(!settVals || settVals.length != 3)
+      return false
+
+    const since = settVals[1]
+    const until = settVals[2]
+    
+    if((new Date(since)) > (new Date(until)))
+      return false
+
+    document.getElementById("showRangeSince").value = since
+    document.getElementById("showRangeUntil").value = until
+    document.getElementById("showRange").checked = true
+    
+    switchProps({ showRange: true })
+    return true
+  }
+  return false
+}
 
 window.addEventListener('load', () => {
   showLoader(true);
-  timer = setInterval(initChart, 60000);
 
+  if(!restoreSettingsFromUrl() && !timer)
+    timer = setInterval(initChart, 60000);
+
+  google.charts.load('current', { 'packages': ['corechart'] });
+  google.charts.setOnLoadCallback(initChart);
+ 
   document.getElementById("lastHours").addEventListener("change", e => 
     switchProps({ lastHours: e.target.checked })
   )
